@@ -1,38 +1,108 @@
 .App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
+  background-color: #262629;
+  color: #c4c4c4;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
   min-height: 100vh;
+}
+
+.quote-wrapper {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  padding: 24px 36px;
+  border-radius: 24px;
+  box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;
+}
+
+.input-wrapper {
+  margin-bottom: 16px;
+}
+
+.token-input {
+  margin: 18px 0 12px;
+  border-radius: 8px;
+  background-color: #363639;
+  color: #c4c4c4;
+  padding: 12px 8px;
+  font-weight: 500;
+  font-size: 24px;
+  border: 0;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 5px 0px,
+    rgba(0, 0, 0, 0.1) 0px 0px 1px 0px;
+}
+
+.token-input:focus {
+  outline: 1px solid #4d4d4d;
+}
+
+.getquote-button {
+  padding: 8px;
+  background-color: rgba(99, 127, 234, 0.4);
+  border-radius: 8px;
+  border: 0;
+  color: rgba(99, 127, 234);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.quote-display-wrapper {
+  margin: 16px;
+  display: flex;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  align-items: center;
+}
+.quote-amount-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.quote-amount {
+  margin: 0 6px;
+  font-size: 24px;
+}
+.quote-display {
+  width: 100%;
 }
 
-.App-link {
-  color: #61dafb;
+.quote-path-display {
+  margin: 12px 6px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.path-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.path-item-wrapper {
+  display: flex;
+  margin: 12px 6px;
+  font-size: 10px;
+  justify-content: space-between;
+  position: relative;
+  width: 100%;
+}
+
+.path-hr-line {
+  width: 100%;
+  position: absolute;
+  height: 2px;
+  background: #848484;
+  top: 50%;
+}
+.path-box {
+  border: 1px solid #848383;
+  background: #262629;
+  padding: 3px;
+  border-radius: 6px;
+  z-index: 1;
+}
+.path-protocol {
+  background: #4e4e4e;
+}
+.path-percent {
+  background: #3f4a77;
+}
+.path-token {
 }
