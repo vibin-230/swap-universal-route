@@ -24,7 +24,7 @@ declare type QuoteDataType = {
 const App = () => {
   const [amount, setAmount] = useState<string>("0");
   const [loader, setLoader] = useState<Boolean>(false);
-  const [quoteAmount, setQuoteAmount] = useState<string>("");
+  const [quoteAmount, setQuoteAmount] = useState<number>(0);
   const [quote, setQuote] = useState<QuoteDataType[]>([]);
 
   const usdc = new Token(chainId, USDC_ADDRESS, 6, "USDC", "USD Coin");
@@ -63,15 +63,16 @@ const App = () => {
 
     //to calculate the sum quote amount from the array
     let _quote_amount = route_data.reduce((a, b): any => {
-      return parseFloat(a.quote) + parseFloat(b.quote);
-    });
-    setQuoteAmount(_quote_amount.quote);
+      return a + parseFloat(b.quote);
+    }, 0);
+
+    setQuoteAmount(_quote_amount);
     setQuote(route_data);
     setLoader(false);
   };
 
   useEffect(() => {
-    setQuoteAmount("");
+    setQuoteAmount(0);
     setQuote([]);
   }, [amount]);
 
@@ -100,10 +101,8 @@ const App = () => {
           ) : quote.length > 0 ? (
             <div className="quote-display">
               <div className="quote-amount-wrapper">
-                <div className="quote-amount">
-                  {quoteAmount.substring(0, 6)}{" "}
-                </div>
-                - COMP
+                <div className="quote-amount">{quoteAmount.toFixed(6)} </div>-
+                COMP
               </div>
               <div className="quote-path-display">
                 <span>Optimal Path:</span>
@@ -124,6 +123,9 @@ const App = () => {
                             </div>
                           );
                         })}
+                        <div className="path-box">
+                          {quote_item.quote.substring(0, 6)}
+                        </div>
 
                         <div className="path-hr-line" />
                       </div>
