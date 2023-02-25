@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import "./App.css";
 import { chainId, COMP_ADDRESS, USDC_ADDRESS } from "./constants";
@@ -69,6 +69,11 @@ const App = () => {
     setQuote(route_data);
     setLoader(false);
   };
+
+  useEffect(() => {
+    setQuoteAmount("");
+    setQuote([]);
+  }, [amount]);
 
   return (
     <div className="App">
