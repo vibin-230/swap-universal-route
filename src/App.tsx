@@ -2,7 +2,7 @@ import { BigNumber, ethers } from "ethers";
 import React, { useState, useEffect } from "react";
 
 import "./App.css";
-import { chainId, COMP_ADDRESS, USDC_ADDRESS } from "./constants";
+import { chainId, MAGIC_ADDRESS, USDC_ADDRESS } from "./constants";
 
 import { Token, TradeType } from "@uniswap/sdk-core";
 import { AlphaRouter, CurrencyAmount } from "@uniswap/smart-order-router";
@@ -123,10 +123,9 @@ export function createCommand(type: CommandType, parameters: any[]): RouterComma
   const encodedInput = defaultAbiCoder.encode(ABI_DEFINITION[type], parameters)
   return { type, encodedInput }
 }
-// Ethereum Network Configuration
-const provider = new ethers.providers.InfuraProvider(
-  "homestead",
-  "acac0ae91ab44dbd82a5f1da8f9e48e8"
+const provider = new ethers.providers.AlchemyProvider(
+  chainId,
+  "dikgDjRuwXPk0J4xq6gTGY_YZA6p2GFs",
 );
 
 const smapleAddress ="0x0000000000000000000000000000000000000001"
@@ -170,8 +169,8 @@ export function encodePath(path: string[], fees: FeeAmount[]): string {
   return encoded.toLowerCase()
 }
 
-function encodePathExactInput(tokens: string[]) {
-  return encodePath(tokens, new Array(tokens.length - 1).fill(FeeAmount.MEDIUM))
+function encodePathExactInput(tokens: string[], fees: FeeAmount[]) {
+  return encodePath(tokens, fees)
 }
 
 const App = () => {
@@ -181,28 +180,30 @@ const App = () => {
   const [quote, setQuote] = useState<QuoteDataType[]>([]);
 
   const usdc = new Token(chainId, USDC_ADDRESS, 6, "USDC", "USD Coin");
-  const comp = new Token(chainId, COMP_ADDRESS, 18, "COMP", "Compound");
+  const magic = new Token(chainId, MAGIC_ADDRESS, 18, "MAGIC", "MAGIC");
 
   // const routerTrade = new UniswapTrade();
   const getAmountOut = async () => {
     setLoader(true);
 
     //converting amount in string to curreny
-    const usdcAmount = ethers.utils.parseUnits(amount, usdc.decimals);
+    const magicAmount = ethers.utils.parseUnits("345.195987516568124676");
+    const usdcAmount = ethers.utils.parseUnits("160.640395", 6);
 
     const router = new AlphaRouter({ chainId, provider });
 
     const route = await router.route(
-      CurrencyAmount.fromRawAmount(usdc, JSBI.BigInt(usdcAmount)),
-      comp,
+      CurrencyAmount.fromRawAmount(magic, JSBI.BigInt(magicAmount)),
+      usdc,
       TradeType.EXACT_INPUT
     );
 
-    
+    console.log(route);
 
     //array to maintain required data from route
     const route_data: QuoteDataType[] = [];
     const routePlanner = new RoutePlanner();
+    const tradeAddress = "0x5c8faA8C5E63AE74E577c401916262E68e7e7BC7";
     let value
     route?.route.map((_quote) => {
       let required_data: QuoteDataType = {
@@ -211,20 +212,24 @@ const App = () => {
         protocol: "",
         percent: 0,
       };
-      required_data.quote = ethers.utils.formatEther(_quote.rawQuote);
+      required_data.quote = ethers.utils.formatUnits(_quote.rawQuote, "6");
       required_data.path = _quote.tokenPath;
       required_data.protocol = _quote.protocol;
       required_data.percent = _quote.percent;
       route_data.push(required_data);
       const _path = _quote.tokenPath.map(path=>path.address)
       if(_quote.protocol === "V2"){
-        value =routePlanner.addCommand(CommandType.V2_SWAP_EXACT_IN,[smapleAddress, expandTo6DecimalsBN(200),expandTo18DecimalsBN(0.003),_path,smapleAddress])
+        value =routePlanner.addCommand(CommandType.V2_SWAP_EXACT_IN,[tradeAddress, magicAmount,expandTo18DecimalsBN(0.003),_path,true])
       } else if (_quote.protocol === "V3") {
-        const path = encodePathExactInput(_path)
-        value =routePlanner.addCommand(CommandType.V3_SWAP_EXACT_IN,[smapleAddress, expandTo6DecimalsBN(200),expandTo18DecimalsBN(0.003),path,smapleAddress])
+        const _fees = _quote.route.pools.map((pool) => {
+          return pool.fee;
+        });
+        const path = encodePathExactInput(_path, _fees)
+        value =routePlanner.addCommand(CommandType.V3_SWAP_EXACT_IN,[tradeAddress, magicAmount,usdcAmount,path,true])
       }
     });
     console.log("routeplaner",value,routePlanner)
+    console.log("route_data",route_data)
   
     //to calculate the sum quote amount from the array
     let _quote_amount = route_data.reduce((a, b): any => {
